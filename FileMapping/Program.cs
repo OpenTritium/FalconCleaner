@@ -116,7 +116,7 @@ try
         StartFileReferenceNumber = 0 //这里经测试发现，如果用FirstUsn有时候不正确，导致获取到不完整的数据，还是直接写0好. 
     };
 
-    const uint bufferSize = 0xFFFF_FFF;
+    const uint bufferSize = 0x1_0000;
 //如果 缓冲区不够 GetLastError 返回 ERROR_INSUFFICIENT_BUFFER，并且 BytesReturned 为0
 // 如果只够写一部分 GetLastError 则返回 ERROR_MORE_DATA ，并且 lpBytesReturned 会回答已写入的量
 // 记得缓存复位
@@ -137,9 +137,9 @@ try
             ))
         {
             // 缓冲区前 8 字节是下一条 USN，然后才是记录
-            const byte nextUsnOffset = 8;
-            remainingBytes -= nextUsnOffset;
-            var pCurrentRecord = IntPtr.Add(pBuffer, nextUsnOffset);
+            const byte usnOffset = sizeof(long);
+            remainingBytes -= usnOffset;
+            var pCurrentRecord = IntPtr.Add(pBuffer, usnOffset);
             requestEnumData.StartFileReferenceNumber = *(ulong*)pBuffer;
             while (remainingBytes != 0)
             {
@@ -198,7 +198,7 @@ try
         var deleteUsnJournalResult = Win32Api.DeviceIoControl(
             volHandle,
             FileSystemControlCode.DeleteUsnJournal,
-            new IntPtr(&requestCreateUsnJournal),
+            new IntPtr(&requestDeleteUsnJournal),
             (uint)sizeof(DeleteUsnJournalData),
             IntPtr.Zero,
             0,
