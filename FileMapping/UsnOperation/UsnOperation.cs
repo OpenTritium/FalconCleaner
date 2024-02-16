@@ -5,45 +5,23 @@ namespace FileMapping.UsnOperation;
 
 internal static class UsnOperation
 {
-	internal static
-		(string? volumeName,
-		string? fileSystemName,
-		uint? serialNumber,
-		uint? fileSytemFlags)
-		GetVolumeInfo(string rootPath)
+	internal static (string? volumeName, string? fileSystemName, uint? serialNumber, uint? fileSytemFlags) GetVolumeInfo(string rootPath)
 	{
 		const uint maxBufferLen = 261;
 		var volumeNameBuffer = new char[maxBufferLen];
 		var fileSystemNameBuffer = new char[maxBufferLen];
 
-		var result = PInvoke.Win32Api.GetVolumeInformationW(
-			rootPath,
-			volumeNameBuffer,
-			maxBufferLen,
-			out var serialNumber,
-			out _,
-			out var fileSystemFlags,
-			fileSystemNameBuffer,
-			maxBufferLen);
-		if (result)
-			return (new string(volumeNameBuffer),
-				new string(fileSystemNameBuffer),
-				serialNumber,
-				fileSystemFlags);
-
+		if(PInvoke.Win32Api.GetVolumeInformationW(rootPath, volumeNameBuffer, 
+			   maxBufferLen, out var serialNumber, out _, 
+			   out var fileSystemFlags, fileSystemNameBuffer, maxBufferLen))
+			return (new string(volumeNameBuffer), new string(fileSystemNameBuffer), serialNumber, fileSystemFlags);
 		return (null, null, null, null);
 	}
 
 	internal static SafeFileHandle? CreateFile(string rootPath)
 	{
-		var volumeHandle = PInvoke.Win32Api.CreateFileW(
-			@"\\.\" + rootPath[..2],
-			DesiredAccess.ReadWrite,
-			FileShare.ReadWrite,
-			IntPtr.Zero,
-			FileMode.Open,
-			FileAttributes.ReadOnly,
-			IntPtr.Zero
+		var volumeHandle = PInvoke.Win32Api.CreateFileW(@"\\.\" + rootPath[..2], DesiredAccess.ReadWrite, FileShare.ReadWrite,
+			IntPtr.Zero, FileMode.Open, FileAttributes.ReadOnly, IntPtr.Zero
 		);
 		return volumeHandle.IsInvalid ? null : volumeHandle;
 	}
@@ -57,15 +35,8 @@ internal static class UsnOperation
 		};
 		unsafe
 		{
-			return PInvoke.Win32Api.DeviceIoControl(
-				volumeHandle,
-				FileSystemControlCode.CreateUsnJournal,
-				new IntPtr(&requestCreateUsnJournal),
-				(uint)sizeof(CreateUsnJournalData),
-				IntPtr.Zero,
-				0,
-				out _,
-				IntPtr.Zero
+			return PInvoke.Win32Api.DeviceIoControl(volumeHandle, FileSystemControlCode.CreateUsnJournal, new IntPtr(&requestCreateUsnJournal),
+				(uint)sizeof(CreateUsnJournalData), IntPtr.Zero, 0, out _, IntPtr.Zero
 			);
 		}
 	}
@@ -81,21 +52,13 @@ internal static class UsnOperation
 		UsnJournalDataV2 responseJournalData = default;
 		unsafe
 		{
-			if (PInvoke.Win32Api.DeviceIoControl(
-				    volumeHandle,
-				    FileSystemControlCode.QueryUsnJournal,
-				    IntPtr.Zero,
-				    0,
-				    new IntPtr(&responseJournalData),
-				    (uint)sizeof(UsnJournalDataV2),
-				    out _, // 一般是 80 字节
-				    IntPtr.Zero
+			if (PInvoke.Win32Api.DeviceIoControl(volumeHandle, FileSystemControlCode.QueryUsnJournal, IntPtr.Zero, 0,
+				    new IntPtr(&responseJournalData), (uint)sizeof(UsnJournalDataV2),out _,IntPtr.Zero
 			    ))
 			{
 				journalData = responseJournalData;
 				return true;
 			}
-
 			journalData = default;
 			return false;
 		}
@@ -120,15 +83,8 @@ internal static class UsnOperation
 		{
 			var pBuffer = (IntPtr)NativeMemory.Alloc(bufferSize);
 			while (
-				PInvoke.Win32Api.DeviceIoControl(
-					volumeHandle,
-					FileSystemControlCode.EnumUsnData,
-					new IntPtr(&requestEnumData),
-					(uint)sizeof(MftEnumDataV1),
-					pBuffer,
-					bufferSize,
-					out var remainingBytes,
-					IntPtr.Zero
+				PInvoke.Win32Api.DeviceIoControl(volumeHandle, FileSystemControlCode.EnumUsnData, new IntPtr(&requestEnumData),
+					(uint)sizeof(MftEnumDataV1), pBuffer, bufferSize, out var remainingBytes, IntPtr.Zero
 				))
 			{
 				// 缓冲区前 8 字节是下一条 USN，然后才是记录
@@ -192,15 +148,8 @@ internal static class UsnOperation
 		};
 		unsafe
 		{
-			return PInvoke.Win32Api.DeviceIoControl(
-				volumeHandle,
-				FileSystemControlCode.DeleteUsnJournal,
-				new IntPtr(&requestDeleteUsnJournal),
-				(uint)sizeof(DeleteUsnJournalData),
-				IntPtr.Zero,
-				0,
-				out _,
-				IntPtr.Zero
+			return PInvoke.Win32Api.DeviceIoControl(volumeHandle, FileSystemControlCode.DeleteUsnJournal, new IntPtr(&requestDeleteUsnJournal),
+				(uint)sizeof(DeleteUsnJournalData), IntPtr.Zero, 0, out _, IntPtr.Zero
 			);
 		}
 	}

@@ -1,4 +1,5 @@
-﻿using FileMapping.UsnOperation;
+﻿using System.Runtime.InteropServices;
+using FileMapping.UsnOperation;
 
 var result = UsnOperation.GetVolumeInfo(@"C:\");
 Console.WriteLine($"{result.serialNumber} {result.volumeName} {result.fileSystemName} {result.fileSytemFlags}");
