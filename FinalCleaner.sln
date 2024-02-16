@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34607.119
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileMapping", "FileMapping\FileMapping.csproj", "{1FBFA70B-35B2-4295-97C7-C0E8AC4B95D0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1FBFA70B-35B2-4295-97C7-C0E8AC4B95D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1FBFA70B-35B2-4295-97C7-C0E8AC4B95D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1FBFA70B-35B2-4295-97C7-C0E8AC4B95D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1FBFA70B-35B2-4295-97C7-C0E8AC4B95D0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7D15E1C1-072A-4B37-ABE2-A14D0D03F859}
+	EndGlobalSection
+EndGlobal
