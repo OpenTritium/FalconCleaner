@@ -1,9 +1,8 @@
 ﻿using System.Runtime.InteropServices;
-using System.Text;
 using FileMapping.UsnOperation;
 using Microsoft.Win32.SafeHandles;
 
-namespace FileMapping;
+namespace FileMapping.PInvoke;
 
 internal static partial class Win32Api
 {
