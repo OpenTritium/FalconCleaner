@@ -3,7 +3,7 @@
 [Flags]
 internal enum UsnDeleteFlags : uint
 {
-    UsnDeleteFlagDelete  = 0x00000001,
-    UsnDeleteFlagNotify = 0x00000002,
-    DeleteAndNotify = UsnDeleteFlagDelete | UsnDeleteFlagNotify
+	UsnDeleteFlagDelete = 0x00000001,
+	UsnDeleteFlagNotify = 0x00000002,
+	DeleteAndNotify = UsnDeleteFlagDelete | UsnDeleteFlagNotify
 }

@@ -5,6 +5,6 @@ namespace FileMapping.UsnOperation;
 [StructLayout(LayoutKind.Sequential)]
 internal readonly ref struct DeleteUsnJournalData
 {
-    internal ulong UsnJournalId { get; init; }
-    internal UsnDeleteFlags DeleteFlags { get; init; }
+	internal ulong UsnJournalId { get; init; }
+	internal UsnDeleteFlags DeleteFlags { get; init; }
 }
