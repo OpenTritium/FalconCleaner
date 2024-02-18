@@ -1,14 +1,15 @@
-﻿using System.Collections;
-using System.Runtime.InteropServices;
-using FileMapping.PInvoke;
+﻿using FileMapping.PInvoke;
 using Microsoft.Win32.SafeHandles;
+using System.Collections;
+using System.Runtime.InteropServices;
 
 namespace FileMapping.UsnOperation;
 
 using UsnRecord = (UInt128? currentFileRef, UInt128? parentFileRef, string? fileName);
 using VolumeDescribe = (string? volumeName, string? fileSystemName, uint? serialNumber, uint? fileSytemFlags);
 
-internal static class UsnOperationUtils
+// todo 全局通过 FILE_FLAG_OVERLAPPED 支持异步
+internal static class UsnUtils
 {
 	internal static VolumeDescribe GetVolumeInfo(char driveLetter)
 	{
@@ -24,7 +25,7 @@ internal static class UsnOperationUtils
 		return (null, null, null, null);
 	}
 
-	internal static SafeFileHandle? CreateFile(char driveLetter)
+	internal static SafeFileHandle? GetVolumeHandle(char driveLetter)
 	{
 		var volumeHandle = Win32Api.CreateFileW(@$"\\.\{driveLetter}:", DesiredAccess.ReadWrite,
 			FileShare.ReadWrite,
@@ -72,10 +73,18 @@ internal static class UsnOperationUtils
 		private uint _validBytesCount;
 		private static readonly IntPtr BufferPointer = (IntPtr)NativeMemory.Alloc(BufferSize);
 		private static IntPtr _currentRecordPointer;
-		private static uint GetCurrentRecordLength() => ((UsnRecordCommonHeader*)_currentRecordPointer)->RecordLength;
-		private static UsnRecordCommonHeader* GetHeaderView() => (UsnRecordCommonHeader*)_currentRecordPointer;
 
-		public bool WriteBufferAndUpdateBytes(MftEnumDataV1 requestEnumData)
+		private static uint GetCurrentRecordLength()
+		{
+			return ((UsnRecordCommonHeader*)_currentRecordPointer)->RecordLength;
+		}
+
+		private static UsnRecordCommonHeader* GetHeaderViewOfCurrentRecord()
+		{
+			return (UsnRecordCommonHeader*)_currentRecordPointer;
+		}
+
+		private bool WriteBufferAndUpdateBytes(MftEnumDataV1 requestEnumData)
 		{
 			if (Win32Api.DeviceIoControl(volumeHandle, FileSystemControlCode.EnumUsnData,
 				    new IntPtr(&requestEnumData),
@@ -132,7 +141,7 @@ internal static class UsnOperationUtils
 				 因为 v4 记录体积小，可以在文件系统忙碌时（大文件）更效率地创建，
 				而尾随的 V3 记录则是总结。
 				 */
-				switch (GetHeaderView()->MajorVersion, GetHeaderView()->MinorVersion)
+				switch (GetHeaderViewOfCurrentRecord()->MajorVersion, GetHeaderViewOfCurrentRecord()->MinorVersion)
 				{
 					case (3, 0):
 						var usnRecordV3Pointer = (UsnRecordV3*)_currentRecordPointer;

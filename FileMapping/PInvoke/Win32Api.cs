@@ -1,9 +1,7 @@
-﻿using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using FileMapping.UsnOperation;
+﻿using FileMapping.UsnOperation;
 using Microsoft.Win32.SafeHandles;
-
-[assembly: DisableRuntimeMarshalling]
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace FileMapping.PInvoke;
 

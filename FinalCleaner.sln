@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34607.119
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileMapping", "FileMapping\FileMapping.csproj", "{1FBFA70B-35B2-4295-97C7-C0E8AC4B95D0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileMapping", "FileMapping\FileMapping.csproj", "{1FBFA70B-35B2-4295-97C7-C0E8AC4B95D0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileMapping.Test", "FileMapping.Test\FileMapping.Test.csproj", "{B8EB35F4-3A8B-46D7-9201-33641FF4F5A6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{1FBFA70B-35B2-4295-97C7-C0E8AC4B95D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1FBFA70B-35B2-4295-97C7-C0E8AC4B95D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1FBFA70B-35B2-4295-97C7-C0E8AC4B95D0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B8EB35F4-3A8B-46D7-9201-33641FF4F5A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B8EB35F4-3A8B-46D7-9201-33641FF4F5A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B8EB35F4-3A8B-46D7-9201-33641FF4F5A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B8EB35F4-3A8B-46D7-9201-33641FF4F5A6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
