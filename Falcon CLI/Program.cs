@@ -1,9 +1,6 @@
-﻿using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using ABI.Windows.Web.UI;
-using FileMapping.RawDiskProber;
+﻿using FileMapping.RawDiskProber;
 
-var deviceHandle = RawDiskUtils.GetPhysicalDiskHandle(1);
+using var deviceHandle = RawDiskUtils.GetPhysicalDiskHandle(1);
 if (deviceHandle is null)
 {
 	Console.WriteLine("物理磁盘句柄无效");
