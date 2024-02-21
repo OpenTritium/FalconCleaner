@@ -4,8 +4,9 @@ using System.Diagnostics;
 namespace FileMapping.Test;
 
 [TestClass]
-public class UsnOperation
+public sealed class UsnOperation
 {
+	// todo 改善单元测试模块化
 	[DataRow('A')]
 	[DataRow('B')]
 	[TestMethod]
