@@ -9,6 +9,7 @@ using UsnRecord = (UInt128? currentFileRef, UInt128? parentFileRef, string? file
 using VolumeDescribe = (string? volumeName, string? fileSystemName, uint? serialNumber, uint? fileSytemFlags);
 
 // todo 全局通过 FILE_FLAG_OVERLAPPED 支持异步
+// 释放安全句柄
 internal static class UsnUtils
 {
 	internal static VolumeDescribe GetVolumeInfo(char driveLetter)

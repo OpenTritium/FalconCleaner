@@ -44,4 +44,23 @@ internal static partial class Win32Api
 		out uint lpBytesReturned,
 		IntPtr lpOverlapped
 	);
+	[LibraryImport("kernel32.dll", SetLastError = true)]
+	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvStdcall) })]
+	[return: MarshalAs(UnmanagedType.Bool)]
+	internal static partial bool SetFilePointerEx(
+		SafeFileHandle hFile,
+		long liDistanceToMove,
+		out IntPtr lpNewFilePointer,
+		MoveMethod dwMoveMethod
+	);
+	[LibraryImport("kernel32.dll", SetLastError = true)]
+	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvStdcall) })]
+	[return: MarshalAs(UnmanagedType.Bool)]
+	internal static partial bool ReadFileEx(
+		SafeFileHandle hFile,
+		[Out] byte[] lpBuffer,
+		uint nNumberOfBytesToRead,
+		ref NativeOverlapped lpOverlapped,
+		IntPtr lpCompletionRoutine
+	);
 }
