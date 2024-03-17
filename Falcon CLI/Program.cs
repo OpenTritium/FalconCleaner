@@ -1,6 +1,6 @@
 ﻿using FileMapping.RawDiskProber;
 
-using var deviceHandle = RawDiskUtils.GetPhysicalDiskHandle(1);
+using var deviceHandle = RawDiskUtils.GetPhysicalDiskHandle(0);
 if (deviceHandle is null)
 {
 	Console.WriteLine("物理磁盘句柄无效");
