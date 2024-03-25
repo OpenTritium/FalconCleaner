@@ -1,4 +1,6 @@
-﻿namespace FileMapping.UsnOperation;
+﻿// ReSharper disable IdentifierTypo
+
+namespace FileMapping.PInvoke;
 
 [Flags]
 internal enum FileSystemFlags : uint

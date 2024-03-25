@@ -5,3 +5,8 @@
 ```powershell
 dotnet restore
 ```
+
+Roadmap
+
+1. 实现 MFT 解析，并缓存到 FASTER
+2. 提供异步实现

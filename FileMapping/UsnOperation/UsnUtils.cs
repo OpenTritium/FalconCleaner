@@ -1,7 +1,9 @@
 ﻿using FileMapping.PInvoke;
+using FileMapping.PInvoke.Usn;
 using Microsoft.Win32.SafeHandles;
 using System.Collections;
 using System.Runtime.InteropServices;
+using static FileMapping.PInvoke.Win32Api;
 
 namespace FileMapping.UsnOperation;
 
@@ -19,7 +21,7 @@ internal static class UsnUtils
 		var volumeNameBuffer = new char[maxBufferLen];
 		var fileSystemNameBuffer = new char[maxBufferLen];
 		var rootPath = $@"{driveLetter}:\";
-		if (Win32Api.GetVolumeInformationW(rootPath, volumeNameBuffer,
+		if (GetVolumeInformationW(rootPath, volumeNameBuffer,
 			    maxBufferLen, out var serialNumber, out _,
 			    out var fileSystemFlags, fileSystemNameBuffer, maxBufferLen))
 			return (new string(volumeNameBuffer), new string(fileSystemNameBuffer), serialNumber, fileSystemFlags);
@@ -28,9 +30,9 @@ internal static class UsnUtils
 
 	internal static SafeFileHandle? GetVolumeHandle(char driveLetter)
 	{
-		var volumeHandle = Win32Api.CreateFileW(@$"\\.\{driveLetter}:", DesiredAccess.ReadWrite,
-			FileShare.ReadWrite,
-			IntPtr.Zero, FileMode.Open, FileAttributes.ReadOnly, IntPtr.Zero
+		var volumeHandle = CreateFileW(@$"\\.\{driveLetter}:", DesiredAccess.ReadWrite,
+			FileShare.ReadWrite, ref NullSecurityAttributes, FileMode.Open, FileFlagsAndAttributes.Readonly,
+			IntPtr.Zero
 		);
 		return volumeHandle.IsInvalid ? null : volumeHandle;
 	}
@@ -43,9 +45,9 @@ internal static class UsnUtils
 			AllocationDelta = 0x400_0000, // 512 MB
 			MaximumSize = 0x2000_0000 // 64 MB
 		};
-		return Win32Api.DeviceIoControl(volumeHandle, FileSystemControlCode.CreateUsnJournal,
+		return DeviceIoControl(volumeHandle, IoControlCodes.CreateUsnJournal,
 			new IntPtr(&requestCreateUsnJournal),
-			(uint)sizeof(CreateUsnJournalData), IntPtr.Zero, 0, out _, IntPtr.Zero
+			(uint)sizeof(CreateUsnJournalData), IntPtr.Zero, 0, out _, ref NullNativeOverlapped
 		);
 	}
 
@@ -53,8 +55,9 @@ internal static class UsnUtils
 		out UsnJournalDataV2 responseUsnJournalData)
 	{
 		UsnJournalDataV2 responseJournalData = default;
-		if (Win32Api.DeviceIoControl(volumeHandle, FileSystemControlCode.QueryUsnJournal, IntPtr.Zero, 0,
-			    new IntPtr(&responseJournalData), (uint)sizeof(UsnJournalDataV2), out _, IntPtr.Zero
+		if (DeviceIoControl(volumeHandle, IoControlCodes.QueryUsnJournal, IntPtr.Zero, 0,
+			    new IntPtr(&responseJournalData), (uint)sizeof(UsnJournalDataV2), out _,
+			    ref NullNativeOverlapped
 		    ))
 		{
 			responseUsnJournalData = responseJournalData;
@@ -75,21 +78,17 @@ internal static class UsnUtils
 		private static readonly IntPtr BufferPointer = (IntPtr)NativeMemory.Alloc(BufferSize);
 		private static IntPtr _currentRecordPointer;
 
-		private static uint GetCurrentRecordLength()
-		{
-			return ((UsnRecordCommonHeader*)_currentRecordPointer)->RecordLength;
-		}
+		private static uint GetCurrentRecordLength() => ((UsnRecordCommonHeader*)_currentRecordPointer)->RecordLength;
 
-		private static UsnRecordCommonHeader* GetHeaderViewOfCurrentRecord()
-		{
-			return (UsnRecordCommonHeader*)_currentRecordPointer;
-		}
+		private static UsnRecordCommonHeader* GetHeaderViewOfCurrentRecord() =>
+			(UsnRecordCommonHeader*)_currentRecordPointer;
 
 		private bool WriteBufferAndUpdateBytes(MftEnumDataV1 requestEnumData)
 		{
-			if (Win32Api.DeviceIoControl(volumeHandle, FileSystemControlCode.EnumUsnData,
+			if (DeviceIoControl(volumeHandle, IoControlCodes.EnumUsnData,
 				    new IntPtr(&requestEnumData),
-				    (uint)sizeof(MftEnumDataV1), BufferPointer, BufferSize, out var bytesReturned, IntPtr.Zero))
+				    (uint)sizeof(MftEnumDataV1), BufferPointer, BufferSize, out var bytesReturned,
+				    ref NullNativeOverlapped))
 			{
 				_validBytesCount = bytesReturned - sizeof(long); // 前 8 字节就是 USN
 				return true;
@@ -125,10 +124,7 @@ internal static class UsnUtils
 			return false;
 		}
 
-		public void Reset()
-		{
-			throw new NotImplementedException();
-		}
+		public void Reset() => throw new NotImplementedException();
 
 		object IEnumerator.Current => Current;
 
@@ -175,15 +171,9 @@ internal static class UsnUtils
 			NativeMemory.Free(BufferPointer.ToPointer());
 		}
 
-		public IEnumerator<UsnRecord> GetEnumerator()
-		{
-			return this;
-		}
+		public IEnumerator<UsnRecord> GetEnumerator() => this;
 
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return GetEnumerator();
-		}
+		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 	}
 
 	internal static unsafe bool DeleteUsnJournal(SafeFileHandle volumeHandle, UsnJournalDataV2 responseJournalData)
@@ -194,9 +184,9 @@ internal static class UsnUtils
 			UsnJournalId = responseJournalData.UsnJournalId
 		};
 
-		return Win32Api.DeviceIoControl(volumeHandle, FileSystemControlCode.DeleteUsnJournal,
+		return DeviceIoControl(volumeHandle, IoControlCodes.DeleteUsnJournal,
 			new IntPtr(&requestDeleteUsnJournal),
-			(uint)sizeof(DeleteUsnJournalData), IntPtr.Zero, 0, out _, IntPtr.Zero
+			(uint)sizeof(DeleteUsnJournalData), IntPtr.Zero, 0, out _, ref NullNativeOverlapped
 		);
 	}
 }

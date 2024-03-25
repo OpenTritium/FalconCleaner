@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace FileMapping.UsnOperation;
+namespace FileMapping.PInvoke.Usn;
 
 [StructLayout(LayoutKind.Sequential)]
 internal struct UsnRecordV3
@@ -16,5 +16,5 @@ internal struct UsnRecordV3
 	internal readonly uint FileAttributes;
 	internal readonly ushort FileNameLength;
 	internal readonly ushort FileNameOffset;
-	internal unsafe fixed char FileName[1];
+	internal unsafe fixed char FileName[1]; // todo 废弃
 }

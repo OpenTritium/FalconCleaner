@@ -1,4 +1,4 @@
-﻿namespace FileMapping.UsnOperation;
+﻿namespace FileMapping.PInvoke;
 
 [Flags]
 internal enum DesiredAccess : uint

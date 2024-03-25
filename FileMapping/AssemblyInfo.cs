@@ -1,4 +1,4 @@
 ﻿using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("FileMapping.Test")]
+[assembly: InternalsVisibleTo("Falcon CLI")]
 [assembly: DisableRuntimeMarshalling]

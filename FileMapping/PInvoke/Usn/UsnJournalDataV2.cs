@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace FileMapping.UsnOperation;
+namespace FileMapping.PInvoke.Usn;
 
 [StructLayout(LayoutKind.Sequential)]
 internal readonly ref struct UsnJournalDataV2
