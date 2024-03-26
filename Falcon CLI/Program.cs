@@ -22,9 +22,24 @@ static bool Parser(byte[] buffer)
 	return true;
 }*/
 
-using FileMapping.SectorAnalysis;
+using FileMapping.SectorAnalysis.PhysicalDisk;
 
 foreach (var i in PhysicalDiskFactory.Instance)
 {
-	Console.WriteLine($"{i.Handle} {i.Id}");
+	Console.WriteLine($"""
+	                   {i.Id}
+	                   {i.DiskSize}
+	                   {i.Geometry.MediaType}
+	                   {i.Geometry.BytesPerSector}
+	                   {i.Geometry.Cylinders}
+	                   {i.Geometry.TracksPerCylinder}
+	                   {i.Geometry.SectorsPerTrack}
+	                   {i.LayoutInformation.DiskId}
+	                   {i.LayoutInformation.StartingUsableOffset}
+	                   {i.LayoutInformation.UsableLength}
+	                   """);
+	foreach (var ii in i.PartitionEntries)
+	{
+		Console.WriteLine($"offset: {ii.StartingOffset} describe: {ii.Name}");
+	}
 }
