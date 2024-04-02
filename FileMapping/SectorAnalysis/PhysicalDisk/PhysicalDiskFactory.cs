@@ -19,9 +19,10 @@ internal sealed class PhysicalDiskFactory : IEnumerable<PhysicalDiskGpt>
 		_trackList.Clear();
 		for (ulong i = 0;; ++i)
 		{
+			//FileFlagsAndAttributes.NoBuffering | FileFlagsAndAttributes.WriteThrough
 			var physicalDiskHandle = CreateFileW(@$"\\.\PhysicalDrive{i}",
 				DesiredAccess.GenericRead, FileShare.Read, ref NullSecurityAttributes, FileMode.Open,
-				FileFlagsAndAttributes.NoBuffering | FileFlagsAndAttributes.WriteThrough, nint.Zero
+				FileFlagsAndAttributes.Readonly, nint.Zero
 			);
 			if (physicalDiskHandle.IsInvalid) yield break;
 			PhysicalDiskGpt? disk;

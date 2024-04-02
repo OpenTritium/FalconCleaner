@@ -50,7 +50,7 @@ internal static partial class Win32Api
 	[LibraryImport("kernel32.dll", SetLastError = true)]
 	[UnmanagedCallConv(CallConvs = [ typeof(CallConvStdcall) ])]
 	[return: MarshalAs(UnmanagedType.Bool)]
-	private static partial bool SetFilePointerEx(
+	internal static partial bool SetFilePointerEx(
 		SafeFileHandle hFile,
 		ulong liDistanceToMove,
 		out IntPtr lpNewFilePointer,
@@ -71,7 +71,7 @@ internal static partial class Win32Api
 	[UnmanagedCallConv(CallConvs = [ typeof(CallConvStdcall) ])]
 	[return: MarshalAs(UnmanagedType.Bool)]
 	internal static partial bool ReadFile(
-		SafeFileHandle hFile,
+		IntPtr hFile,
 		[Out] byte[] lpBuffer,
 		uint nNumberOfBytesToRead,
 		out uint lpNumberOfBytesRead,
@@ -82,7 +82,7 @@ internal static partial class Win32Api
 	[UnmanagedCallConv(CallConvs = [ typeof(CallConvStdcall) ])]
 	[return: MarshalAs(UnmanagedType.Bool)]
 	internal static partial bool ReadFileEx(
-		SafeFileHandle hFile,
+		IntPtr hFile,
 		[Out] byte[] lpBuffer,
 		uint nNumberOfBytesToRead,
 		ref NativeOverlapped? lpOverlapped,
