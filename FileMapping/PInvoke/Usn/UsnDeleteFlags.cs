@@ -1,4 +1,4 @@
-﻿namespace FileMapping.PInvoke.Usn;
+﻿namespace FileMapping.PInvoke.USN;
 
 [Flags]
 internal enum UsnDeleteFlags : uint

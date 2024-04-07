@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace FileMapping.PInvoke.Usn;
+namespace FileMapping.PInvoke.USN;
 
 /// <summary>
 /// 仅当启用范围跟踪且文件大小等于或大于 RangeTrackFileSizeThreshold 成员的值时，才会输出USN_RECORD_V4记录。

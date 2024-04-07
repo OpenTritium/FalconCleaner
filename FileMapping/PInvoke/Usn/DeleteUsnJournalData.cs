@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace FileMapping.PInvoke.Usn;
+namespace FileMapping.PInvoke.USN;
 
 [StructLayout(LayoutKind.Sequential)]
 internal readonly ref struct DeleteUsnJournalData

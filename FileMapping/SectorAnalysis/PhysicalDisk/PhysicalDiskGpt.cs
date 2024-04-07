@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel;
-using System.Globalization;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using FileMapping.PInvoke;
 using FileMapping.PInvoke.DiskGeometry;
@@ -12,11 +12,13 @@ namespace FileMapping.SectorAnalysis.PhysicalDisk;
 
 /// <summary>
 /// 只保证 GPT 硬盘的顺利构建，遇到 MBR 硬盘会抛出异常
+/// 持有物理磁盘句柄，及时更新物理磁盘参数
 /// </summary>
-internal sealed class PhysicalDiskGpt
+// todo 响应磁盘变化事件
+internal sealed class PhysicalDiskGpt : IDisposable
 {
     internal readonly ulong Id;
-    internal readonly SafeFileHandle Handle;
+    internal readonly SafeFileHandle Handle; // 持有句柄是为了更新信息
     internal readonly DiskGeometry Geometry;
     internal readonly DataSize DiskSize;
     internal readonly uint PartitionCount;
@@ -48,7 +50,7 @@ internal sealed class PhysicalDiskGpt
         }
         catch (Exception exception)
         {
-            Console.WriteLine(exception.Message);
+            Debug.WriteLine(exception.Message);
             NativeMemory.Free(bufferPointer);
         }
 
@@ -56,8 +58,8 @@ internal sealed class PhysicalDiskGpt
         LayoutInformation = driveLayoutInformationExPointer->DummyUnionName.Gpt;
 
         PartitionEntries = new PartitionTableEnumerable(driveLayoutInformationExPointer).Select(Bridge).ToArray();
-        DeviceIoControl(handle, IoControlCodes.GetDriveGeometryEx, nint.Zero, 0, new nint(bufferPointer),
-            presetSize, out _, ref NullNativeOverlapped);
+        DeviceIoControl(handle, IoControlCodes.GetDriveGeometryEx, IntPtr.Zero, 0, new IntPtr(bufferPointer),
+            presetSize, out _,IntPtr.Zero);
         var diskGeometryExPointer = (DiskGeometryEx*)bufferPointer;
         DiskSize = new DataSize((ulong)diskGeometryExPointer->DiskSize);
         Geometry = diskGeometryExPointer->geometry;
@@ -85,18 +87,20 @@ internal sealed class PhysicalDiskGpt
         {
             try
             {
-                return DeviceIoControl(Handle, IoControlCodes.GetDriveLayoutEx, nint.Zero, 0,
-                    new nint(bufferPointer), presetSize, out _, ref NullNativeOverlapped)
+                return DeviceIoControl(Handle, IoControlCodes.GetDriveLayoutEx, IntPtr.Zero, 0,
+                    new IntPtr(bufferPointer), presetSize, out _, IntPtr.Zero)
                     ? true
                     : throw new Win32Exception();
             }
             catch (Win32Exception exception)
             {
-                Console.WriteLine(exception.Message);
+                Debug.WriteLine(exception.Message);
                 presetSize += (uint)sizeof(PartitionInformationEx);
                 bufferPointer = NativeMemory.Realloc(bufferPointer, presetSize);
                 return false;
             }
         }
     }
+
+    public void Dispose() => Handle.Dispose();
 }

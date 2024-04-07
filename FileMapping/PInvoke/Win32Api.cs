@@ -6,8 +6,6 @@ namespace FileMapping.PInvoke;
 
 internal static partial class Win32Api
 {
-	internal static SecurityAttributes? NullSecurityAttributes = null;
-	internal static NativeOverlapped? NullNativeOverlapped = null;
 
 	[LibraryImport("kernel32.dll", SetLastError = true, StringMarshalling = StringMarshalling.Utf16)]
 	[UnmanagedCallConv(CallConvs = [ typeof(CallConvStdcall) ])]
@@ -28,7 +26,7 @@ internal static partial class Win32Api
 		string lpFileName,
 		DesiredAccess dwDesiredAccess,
 		FileShare dwShareMode,
-		ref SecurityAttributes? lpSecurityAttributes,
+		IntPtr lpSecurityAttributes,
 		FileMode dwCreationDisposition,
 		FileFlagsAndAttributes dwFlagsAndAttributes,
 		IntPtr hTemplateFile);
@@ -44,26 +42,32 @@ internal static partial class Win32Api
 		IntPtr lpOutBuffer,
 		uint nOutBufferSize,
 		out uint lpBytesReturned,
-		ref NativeOverlapped? lpOverlapped
+		IntPtr lpOverlapped
 	);
 
 	[LibraryImport("kernel32.dll", SetLastError = true)]
 	[UnmanagedCallConv(CallConvs = [ typeof(CallConvStdcall) ])]
 	[return: MarshalAs(UnmanagedType.Bool)]
-	internal static partial bool SetFilePointerEx(
+	private static partial bool SetFilePointerEx(
 		SafeFileHandle hFile,
 		ulong liDistanceToMove,
 		out IntPtr lpNewFilePointer,
 		MoveMethod dwMoveMethod
 	);
 
+	/// <summary>
+	/// 移动文件句柄内的文件指针
+	/// </summary>
+	/// <param name="hFile">文件句柄</param>
+	/// <param name="liDistanceToMove">移动距离，移动方法为 <seealso cref="MoveMethod.Begin"/> 时，移动距离会被诠释成无符号数，其余情况均是有符号</param>
+	/// <param name="dwMoveMethod">移动方向</param>
+	/// <returns>若移动成功，返回新的文件指针位置。失败则为空</returns>
 	internal static IntPtr? SetFilePointerEx(
 		SafeFileHandle hFile,
-		long liDistanceToMove,
+		ulong liDistanceToMove,
 		MoveMethod dwMoveMethod
 	) =>
-		// 移动方法为 Begin 时，移动距离会被诠释成无符号数，其余情况均是有符号
-		SetFilePointerEx(hFile, unchecked((ulong)liDistanceToMove), out var newPointer, dwMoveMethod)
+		SetFilePointerEx(hFile, liDistanceToMove, out var newPointer, dwMoveMethod)
 			? newPointer
 			: null;
 
@@ -71,11 +75,11 @@ internal static partial class Win32Api
 	[UnmanagedCallConv(CallConvs = [ typeof(CallConvStdcall) ])]
 	[return: MarshalAs(UnmanagedType.Bool)]
 	internal static partial bool ReadFile(
-		IntPtr hFile,
-		[Out] byte[] lpBuffer,
+		SafeFileHandle hFile,
+		IntPtr lpBuffer,
 		uint nNumberOfBytesToRead,
 		out uint lpNumberOfBytesRead,
-		ref NativeOverlapped? lpOverlapped
+		IntPtr lpOverlapped
 	);
 
 	[LibraryImport("kernel32.dll", SetLastError = true)]
@@ -85,7 +89,7 @@ internal static partial class Win32Api
 		IntPtr hFile,
 		[Out] byte[] lpBuffer,
 		uint nNumberOfBytesToRead,
-		ref NativeOverlapped? lpOverlapped,
+		IntPtr lpOverlapped,
 		IntPtr lpCompletionRoutine
 	);
 }

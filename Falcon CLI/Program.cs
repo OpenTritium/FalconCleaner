@@ -23,6 +23,7 @@ static bool Parser(byte[] buffer)
 }*/
 
 using FileMapping.SectorAnalysis;
+using FileMapping.SectorAnalysis.MFT;
 using FileMapping.SectorAnalysis.PhysicalDisk;
 
 foreach (var i in PhysicalDiskFactory.Instance)
@@ -42,10 +43,12 @@ foreach (var i in PhysicalDiskFactory.Instance)
 	foreach (var ii in i.PartitionEntries)
 	{
 		Console.WriteLine($"offset: {ii.StartingOffset} describe: {ii.Name}");
+
 	}
 
-	foreach (var r in new MftInterpreterFactory(i))
+	foreach (var v in new MftStreamFactory(i))
 	{
-		r.ParseBoot();
+		v.ParseBoot();
 	}
+	
 }

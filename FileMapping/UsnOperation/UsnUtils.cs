@@ -1,5 +1,5 @@
 ﻿using FileMapping.PInvoke;
-using FileMapping.PInvoke.Usn;
+using FileMapping.PInvoke.USN;
 using Microsoft.Win32.SafeHandles;
 using System.Collections;
 using System.Runtime.InteropServices;
@@ -31,7 +31,7 @@ internal static class UsnUtils
 	internal static SafeFileHandle? GetVolumeHandle(char driveLetter)
 	{
 		var volumeHandle = CreateFileW(@$"\\.\{driveLetter}:", DesiredAccess.ReadWrite,
-			FileShare.ReadWrite, ref NullSecurityAttributes, FileMode.Open, FileFlagsAndAttributes.Readonly,
+			FileShare.ReadWrite, IntPtr.Zero, FileMode.Open, FileFlagsAndAttributes.Readonly,
 			IntPtr.Zero
 		);
 		return volumeHandle.IsInvalid ? null : volumeHandle;
@@ -47,7 +47,7 @@ internal static class UsnUtils
 		};
 		return DeviceIoControl(volumeHandle, IoControlCodes.CreateUsnJournal,
 			new IntPtr(&requestCreateUsnJournal),
-			(uint)sizeof(CreateUsnJournalData), IntPtr.Zero, 0, out _, ref NullNativeOverlapped
+			(uint)sizeof(CreateUsnJournalData), IntPtr.Zero, 0, out _, IntPtr.Zero
 		);
 	}
 
@@ -57,7 +57,7 @@ internal static class UsnUtils
 		UsnJournalDataV2 responseJournalData = default;
 		if (DeviceIoControl(volumeHandle, IoControlCodes.QueryUsnJournal, IntPtr.Zero, 0,
 			    new IntPtr(&responseJournalData), (uint)sizeof(UsnJournalDataV2), out _,
-			    ref NullNativeOverlapped
+			    IntPtr.Zero
 		    ))
 		{
 			responseUsnJournalData = responseJournalData;
@@ -88,7 +88,7 @@ internal static class UsnUtils
 			if (DeviceIoControl(volumeHandle, IoControlCodes.EnumUsnData,
 				    new IntPtr(&requestEnumData),
 				    (uint)sizeof(MftEnumDataV1), BufferPointer, BufferSize, out var bytesReturned,
-				    ref NullNativeOverlapped))
+				    IntPtr.Zero))
 			{
 				_validBytesCount = bytesReturned - sizeof(long); // 前 8 字节就是 USN
 				return true;
@@ -186,7 +186,7 @@ internal static class UsnUtils
 
 		return DeviceIoControl(volumeHandle, IoControlCodes.DeleteUsnJournal,
 			new IntPtr(&requestDeleteUsnJournal),
-			(uint)sizeof(DeleteUsnJournalData), IntPtr.Zero, 0, out _, ref NullNativeOverlapped
+			(uint)sizeof(DeleteUsnJournalData), IntPtr.Zero, 0, out _, IntPtr.Zero
 		);
 	}
 }

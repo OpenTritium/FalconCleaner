@@ -6,6 +6,6 @@ namespace FileMapping.PInvoke;
 internal readonly struct SecurityAttributes
 {
 	internal uint Length { get; init; }
-	internal nint SecurityDescriptor { get; init; }
+	internal IntPtr SecurityDescriptor { get; init; }
 	internal bool InheritHandle { get; init; }
 }
