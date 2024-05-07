@@ -9,9 +9,8 @@ public readonly struct DataSize(ulong actual)
 	internal readonly ulong Actual = actual;
 	public override string ToString() => ToString(null, CultureInfo.CurrentCulture);
 
-	public string ToString(string? format, IFormatProvider? formatProvider)
-	{
-		return format switch
+	public string ToString(string? format, IFormatProvider? formatProvider) =>
+		format switch
 		{
 			null => AutoMatch(),
 			"B" => Actual + " B",
@@ -21,7 +20,6 @@ public readonly struct DataSize(ulong actual)
 				$"{(Actual / GetUnitScale(format[0], false)).ToString(formatProvider)} {format}",
 			_ => throw new Exception()
 		};
-	}
 
 	public static implicit operator ulong(DataSize d) => d.Actual;
 

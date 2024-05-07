@@ -30,7 +30,7 @@ foreach (var i in PhysicalDiskFactory.Instance)
 {
 	Console.WriteLine($"""
 	                   {i.Id}
-	                   {i.DiskSize}
+	                   {i.DiskSize:KiB}
 	                   {i.Geometry.MediaType}
 	                   {i.Geometry.BytesPerSector}
 	                   {i.Geometry.Cylinders}
