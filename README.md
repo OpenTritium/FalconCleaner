@@ -6,7 +6,5 @@
 dotnet restore
 ```
 
-Roadmap
-
-1. 实现 MFT 解析，并缓存到 FASTER
-2. 提供异步实现
+## 此项目处于停滞状态
+## 正在等待 Refs 逆向成果
